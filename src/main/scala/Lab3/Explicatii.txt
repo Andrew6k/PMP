@@ -1,0 +1,10 @@
+#Ex2
+The probabilities will be greater because for sideBed wrong it will show "Oh no, not again" with probability 1.0.
+
+
+#Ex3
+a. The program will produce the result 1.0, because x and z will always be equal so w will be always true.
+b. For x and z to be both true we have 0.4 * 0.4 = 0.16, for both false 0.6 * 0.6 = 0.36. The result will be 0.16+0.36=0.52
+
+#Ex4 
+The maximum number of dices will be 11, because for 12 dices the minimum sum will be 12.
