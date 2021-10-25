@@ -6,7 +6,7 @@ import com.cra.figaro.library.compound.{RichCPD, OneOf, *}
 import com.cra.figaro.language.{Flip, Constant, Apply}
 import com.cra.figaro.algorithm.factored.VariableElimination
 
-object Ex4 {
+object Ex42 {
     def main(args: Array[String]) {
         // To keep the code simple, I just make the cards an integer
         val cards = List(5, 4, 3, 2, 1)
@@ -18,35 +18,43 @@ object Ex4 {
             discrete.Uniform(cards.filter(_ != card):_*)
         )
         
-        val player1Bet1 = RichCPD(player1Card,
-            // Player 1 is more likely to bet with a higher card,
-            // but will sometimes bet with a lower card to bluff
-            OneOf(5, 4, 3) -> Flip(0.9),
-            * -> Flip(0.4) // ×××Change this for part (c)×××
+        val player1Card2= Chain(player1Card, player2Card,(card: Int, card2: Int)=>
+            discrete.Uniform((cards.filter(_ != card ):_*).filter(_ != card2):_*)
+        )
+
+        val player2Card2 = Chain(player2Card, (card: Int) =>
+            discrete.Uniform(cards.filter(_ != card):_*)
         )
         
-        val player2Bet = RichCPD(player2Card, player1Bet1,
-            (OneOf(5, 4), *) -> Flip(0.9),
-            (*, OneOf(false)) -> Flip(0.5),
-            (*, *) -> Flip(0.1)
+        val player1Bet1 = RichCPD(player1Card, player1Card2,
+            // Player 1 is more likely to bet with a higher card,
+            // but will sometimes bet with a lower card to bluff
+            (OneOf(5, 4, 3),OneOf(5,4)) -> Flip(0.9),
+            (*,*) -> Flip(0.4) // ×××Change this for part (c)×××
+        )
+        
+        val player2Bet = RichCPD(player2Card, player1Bet1,player2Card2,
+            (OneOf(5, 4), *, OneOf(4,3)) -> Flip(0.9),
+            (*, OneOf(false),OneOf(5,4)) -> Flip(0.5),
+            (*, *,*) -> Flip(0.1)
         )
         
         val player1Bet2 =
-        Apply(player1Card, player1Bet1, player2Bet,
-            (card: Int, bet11: Boolean, bet2: Boolean) =>
+        Apply(player1Card, player1Bet1, player2Bet,player1Card2,
+            (card: Int, bet11: Boolean, bet2: Boolean,card1:Int) =>
             // Player 1’s second bet is only relevant if she passed the
             // first time and player 2 bet
-            !bet11 && bet2 && (card == 5 || card == 4)
+            !bet11 && bet2 && (card == 5 || card == 4) && (card1==4 || card1==3)
         
         )
         // This element represents the gain to player 1 from the game. I have
         // made it an Element[Double] so I can query its mean.
-        val player1Gain = Apply(player1Card, player2Card, player1Bet1, player2Bet, player1Bet2,
-            (card1: Int, card2: Int, bet11: Boolean, bet2: Boolean, bet12: Boolean) =>
+        val player1Gain = Apply(player1Card, player2Card, player1Bet1, player2Bet, player1Bet2,player1Card2,player2Card2,
+            (card1: Int, card2: Int, bet11: Boolean, bet2: Boolean, bet12: Boolean, card12: Int, card21: Int) =>
                 if (!bet11 && !bet2) 0.0
                 else if (bet11 && !bet2) 1.0
                 else if (!bet11 && bet2 && !bet12) -1.0
-                else if (card1 > card2) 2.0
+                else if ((card1 + card12) > (card2+ card21)) 2.0
                 else -2.0
         )
 
