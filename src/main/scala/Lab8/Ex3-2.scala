@@ -41,7 +41,7 @@ object Ex32 {
 				else
 					FromRange(1,5)
 			)
-        }
+        }//
 		for{course <- 0 until length} {
 			pass(course) = Apply(score(course),(s: Int)=>
 				if(s>=5)
@@ -53,6 +53,13 @@ object Ex32 {
 		pass(0).observe(true)
 		pass(1).observe(true)
 		pass(2).observe(true)
-		VariableElimination.probability(pass(9),true)		
+		VariableElimination.probability(pass(9),true)	
+
+        pass(0).unobserve()	
+        pass(1).unobserve()
+        pass(2).unobserve()
+        pass(5).observe(true)
+        pass(6).observe(true)
+        VariableElimination.probability(pass(9),true)
 	}
 }
