@@ -28,5 +28,18 @@ object Ex1 {
 	}
 	def main(args: Array[String]) {
 		var autori:Array[Autor]=new Array[Autor](5)
+		var albums:Array[Album]=new Array[Album](10)
+		for (i <- 0 to 10){
+			val j = FromRange(0, 5)
+			albums(i)=Album(autori(j))
+		}
+		val nominalizari:Array[Nominalizare]=new Array[Nominalizare](10)
+		for (i <- 0 to 10){
+			nominalizari(i)=Nominalizare(albums(i))
+		}
+		println(MetropolisHastings.probability(nominalizari(0).getProb(),true))
+		for (i <- 0 to 10){
+			println(MetropolisHastings.probability(nominalizari(i).getProb(),true))
+		}
 	}
 }
